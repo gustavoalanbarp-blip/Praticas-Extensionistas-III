@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClinicaMS - Sistema de Agendamento de Consultas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --primary: #0EA5E9; --primary-dark: #0369A1; --text: #1E293B; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; color: var(--text); }
+
+        /* NAVBAR */
+        nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,.95); backdrop-filter: blur(8px); border-bottom: 1px solid #E2E8F0; padding: .875rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+        .nav-logo { display: flex; align-items: center; gap: .5rem; font-size: 1.2rem; font-weight: 800; color: var(--text); text-decoration: none; }
+        .nav-logo i { color: var(--primary); font-size: 1.4rem; }
+        .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+        .nav-links a { text-decoration: none; color: #64748B; font-size: .9rem; font-weight: 500; transition: color .15s; }
+        .nav-links a:hover { color: var(--primary); }
+        .btn-login { background: var(--primary); color: #fff; padding: .5rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: .875rem; text-decoration: none; transition: background .15s; }
+        .btn-login:hover { background: var(--primary-dark); color: #fff; }
+
+        /* HERO */
+        .hero { background: linear-gradient(135deg, #0F172A 0%, #0C4A6E 50%, #0369A1 100%); color: #fff; padding: 7rem 2rem 6rem; text-align: center; }
+        .hero-badge { display: inline-flex; align-items: center; gap: .5rem; background: rgba(14,165,233,.2); border: 1px solid rgba(14,165,233,.4); color: #7DD3FC; padding: .4rem 1rem; border-radius: 99px; font-size: .8rem; font-weight: 600; margin-bottom: 1.5rem; }
+        .hero h1 { font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 900; line-height: 1.15; max-width: 720px; margin: 0 auto 1.25rem; }
+        .hero h1 span { color: #38BDF8; }
+        .hero p { font-size: 1.1rem; color: #94A3B8; max-width: 560px; margin: 0 auto 2.5rem; line-height: 1.65; }
+        .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn-hero { display: inline-flex; align-items: center; gap: .5rem; padding: .875rem 2rem; border-radius: 10px; font-size: 1rem; font-weight: 700; text-decoration: none; transition: all .2s; }
+        .btn-hero-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(14,165,233,.4); }
+        .btn-hero-primary:hover { background: #0284C7; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(14,165,233,.4); color: #fff; }
+        .btn-hero-outline { border: 2px solid rgba(255,255,255,.3); color: #fff; }
+        .btn-hero-outline:hover { border-color: #fff; background: rgba(255,255,255,.1); color: #fff; }
+        .hero-stats { display: flex; gap: 2.5rem; justify-content: center; flex-wrap: wrap; margin-top: 4rem; padding-top: 3rem; border-top: 1px solid rgba(255,255,255,.1); }
+        .hero-stat { text-align: center; }
+        .hero-stat strong { display: block; font-size: 2rem; font-weight: 800; color: #fff; }
+        .hero-stat span { font-size: .85rem; color: #94A3B8; }
+
+        /* FEATURES */
+        .section { padding: 5rem 2rem; }
+        .section-header { text-align: center; margin-bottom: 3rem; }
+        .section-label { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--primary); margin-bottom: .5rem; }
+        .section-header h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 800; color: var(--text); }
+        .section-header p { color: #64748B; margin-top: .75rem; max-width: 560px; margin-left: auto; margin-right: auto; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1100px; margin: 0 auto; }
+        .feature-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; padding: 1.75rem; box-shadow: 0 1px 3px rgba(0,0,0,.06); transition: box-shadow .2s, transform .2s; }
+        .feature-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.1); transform: translateY(-4px); }
+        .feature-icon { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 1rem; }
+        .feature-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: .5rem; }
+        .feature-card p { color: #64748B; font-size: .875rem; line-height: 1.6; }
+
+        /* HOW IT WORKS */
+        .how-section { background: #F8FAFC; }
+        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; max-width: 900px; margin: 0 auto; position: relative; }
+        .step { text-align: center; padding: 1.5rem; }
+        .step-num { width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+        .step h4 { font-size: 1rem; font-weight: 700; margin-bottom: .4rem; }
+        .step p { color: #64748B; font-size: .85rem; line-height: 1.6; }
+
+        /* CTA */
+        .cta-section { background: linear-gradient(135deg, var(--primary-dark), #0EA5E9); color: #fff; text-align: center; padding: 5rem 2rem; }
+        .cta-section h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 800; margin-bottom: 1rem; }
+        .cta-section p { color: rgba(255,255,255,.8); max-width: 500px; margin: 0 auto 2rem; }
+
+        /* FOOTER */
+        footer { background: #0F172A; color: #94A3B8; text-align: center; padding: 2.5rem 1rem; font-size: .875rem; }
+        footer strong { color: #fff; }
+        footer .footer-links { display: flex; gap: 1.5rem; justify-content: center; margin-top: .75rem; }
+        footer .footer-links a { color: #64748B; text-decoration: none; font-size: .8rem; }
+        footer .footer-links a:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/index.html" class="nav-logo"><i class="fas fa-heartbeat"></i> ClinicaMS</a>
+        <div class="nav-links">
+            <a href="#funcionalidades">Funcionalidades</a>
+            <a href="#como-funciona">Como Funciona</a>
+            <a href="/contato.html">Contato</a>
+            <a href="/login.html" class="btn-login"><i class="fas fa-sign-in-alt"></i> Entrar</a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-badge"><i class="fas fa-shield-alt"></i> Sistema Seguro e Confiável</div>
+        <h1>Gestão de Consultas <span>Médicas</span> Simplificada</h1>
+        <p>Plataforma completa para agendamento e gerenciamento de consultas clínicas. Reduza filas, elimine conflitos de horários e melhore a experiência dos pacientes.</p>
+        <div class="hero-actions">
+            <a href="/login.html" class="btn-hero btn-hero-primary"><i class="fas fa-rocket"></i> Acessar o Sistema</a>
+            <a href="#como-funciona" class="btn-hero btn-hero-outline"><i class="fas fa-play-circle"></i> Como Funciona</a>
+        </div>
+        <div class="hero-stats">
+            <div class="hero-stat"><strong>CRUD</strong><span>Completo</span></div>
+            <div class="hero-stat"><strong>SQLite</strong><span>Banco de Dados</span></div>
+            <div class="hero-stat"><strong>MVP</strong><span>Funcional</span></div>
+            <div class="hero-stat"><strong>REST</strong><span>API Completa</span></div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section" id="funcionalidades">
+        <div class="section-header">
+            <div class="section-label">Funcionalidades</div>
+            <h2>Tudo que sua clínica precisa</h2>
+            <p>Uma solução completa para gerenciar médicos, pacientes e consultas em um único lugar.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon" style="background:#DBEAFE;color:#1D4ED8;"><i class="fas fa-user-injured"></i></div>
+                <h3>Gestão de Pacientes</h3>
+                <p>Cadastro completo com CPF, telefone, e-mail e data de nascimento. Busca rápida e edição facilitada.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:#DCFCE7;color:#15803D;"><i class="fas fa-user-md"></i></div>
+                <h3>Gestão de Médicos</h3>
+                <p>Controle de CRM, especialidade e dados de contato. Organize a equipe da clínica com eficiência.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:#FEF3C7;color:#D97706;"><i class="fas fa-calendar-check"></i></div>
+                <h3>Agendamento Inteligente</h3>
+                <p>Verificação automática de conflitos de horários. Nunca mais dois pacientes no mesmo horário.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:#F3E8FF;color:#7C3AED;"><i class="fas fa-chart-bar"></i></div>
+                <h3>Relatórios e Pesquisa</h3>
+                <p>Filtre consultas por data, médico, paciente e status. Visualize estatísticas em tempo real.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:#FFF1F2;color:#E11D48;"><i class="fas fa-file-medical"></i></div>
+                <h3>Prontuário Digital</h3>
+                <p>Registre anotações e prontuário diretamente na consulta. Histórico completo do paciente.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background:#ECFEFF;color:#0891B2;"><i class="fas fa-lock"></i></div>
+                <h3>Acesso Seguro</h3>
+                <p>Sistema de login com senha criptografada. Controle de sessão para proteger os dados.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section how-section" id="como-funciona">
+        <div class="section-header">
+            <div class="section-label">Passo a Passo</div>
+            <h2>Como Funciona</h2>
+            <p>Em poucos passos, gerencie toda a agenda da sua clínica.</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step">
+                <div class="step-num">1</div>
+                <h4>Faça Login</h4>
+                <p>Acesse o sistema com suas credenciais de administrador de forma segura.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <h4>Cadastre Médicos</h4>
+                <p>Registre os profissionais de saúde com CRM e especialidade.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <h4>Cadastre Pacientes</h4>
+                <p>Adicione os pacientes com seus dados pessoais e de contato.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <h4>Agende Consultas</h4>
+                <p>Crie agendamentos vinculando médico, paciente, data e hora automaticamente.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <h2>Pronto para começar?</h2>
+        <p>Acesse o sistema agora e experimente todas as funcionalidades do ClinicaMS.</p>
+        <a href="/login.html" class="btn-hero btn-hero-primary" style="display:inline-flex;"><i class="fas fa-sign-in-alt"></i> Acessar o Sistema</a>
+        <p style="margin-top:1.5rem;font-size:.8rem;opacity:.7;">Credenciais demo: <strong>admin@clinica.com</strong> / <strong>admin123</strong></p>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <strong>ClinicaMS</strong> — Sistema de Agendamento de Consultas Clínicas
+        <br><span style="font-size:.8rem;">Práticas Extensionistas III — Gustavo Alan Barp — 2024</span>
+        <div class="footer-links">
+            <a href="/index.html">Início</a>
+            <a href="/login.html">Login</a>
+            <a href="/contato.html">Contato</a>
+        </div>
+    </footer>
+</body>
+</html>

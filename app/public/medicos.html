@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Médicos — ClinicaMS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="d-flex">
+    <nav class="sidebar">
+        <div class="sidebar-header"><a href="/index.html" class="sidebar-logo"><i class="fas fa-heartbeat"></i> ClinicaMS</a></div>
+        <div class="sidebar-nav">
+            <a href="/dashboard.html" class="nav-link" data-page="dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+            <div class="sidebar-section">Cadastros</div>
+            <a href="/pacientes.html" class="nav-link" data-page="pacientes"><i class="fas fa-user-injured"></i> Pacientes</a>
+            <a href="/medicos.html" class="nav-link" data-page="medicos"><i class="fas fa-user-md"></i> Médicos</a>
+            <div class="sidebar-section">Agenda</div>
+            <a href="/consultas.html" class="nav-link" data-page="consultas"><i class="fas fa-calendar-alt"></i> Consultas</a>
+            <a href="/relatorio.html" class="nav-link" data-page="relatorio"><i class="fas fa-chart-bar"></i> Relatórios</a>
+            <div class="sidebar-section">Outros</div>
+            <a href="/contato.html" class="nav-link" data-page="contato"><i class="fas fa-envelope"></i> Contato</a>
+        </div>
+        <div class="sidebar-footer"><button class="btn-logout" id="btnLogout"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
+    </nav>
+
+    <main class="main-content">
+        <header class="topbar">
+            <span class="topbar-title"><i class="fas fa-user-md" style="color:#16A34A;"></i> Médicos</span>
+            <div class="topbar-user"><div class="avatar" id="userAvatar">A</div><span id="userName"></span></div>
+        </header>
+        <div class="content-area">
+            <div class="page-header">
+                <h1>Gerenciar Médicos</h1>
+                <button class="btn btn-primary" onclick="openNew()"><i class="fas fa-user-plus"></i> Novo Médico</button>
+            </div>
+            <div id="alertMain"></div>
+            <div class="table-container">
+                <div class="table-toolbar">
+                    <h2>Lista de Médicos <span class="badge badge-info" id="countBadge">0</span></h2>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Buscar por nome, CRM ou especialidade..." style="width:300px;" oninput="debounceSearch()">
+                    </div>
+                </div>
+                <div class="table-overflow">
+                    <table>
+                        <thead>
+                            <tr><th>Nome</th><th>CRM</th><th>Especialidade</th><th>Telefone</th><th>E-mail</th><th>Ações</th></tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 id="modalTitle">Novo Médico</h3>
+            <button class="modal-close" onclick="closeModal('modal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div id="alertModal"></div>
+            <form id="form">
+                <input type="hidden" id="medicoId">
+                <div class="form-row-2">
+                    <div class="form-group" style="grid-column:1/-1;">
+                        <label>Nome Completo *</label>
+                        <input type="text" class="form-control" id="nome" placeholder="Dr(a). Nome do médico" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CRM *</label>
+                        <input type="text" class="form-control" id="crm" placeholder="CRM/UF 00000" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Especialidade *</label>
+                        <select class="form-control" id="especialidade" required>
+                            <option value="">Selecione...</option>
+                            <option>Clínico Geral</option>
+                            <option>Cardiologia</option>
+                            <option>Pediatria</option>
+                            <option>Ortopedia</option>
+                            <option>Neurologia</option>
+                            <option>Ginecologia</option>
+                            <option>Dermatologia</option>
+                            <option>Endocrinologia</option>
+                            <option>Oftalmologia</option>
+                            <option>Psiquiatria</option>
+                            <option>Urologia</option>
+                            <option>Outra</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="text" class="form-control" id="telefone" placeholder="(00) 0000-0000">
+                    </div>
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <input type="email" class="form-control" id="email" placeholder="medico@clinica.com">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modal')">Cancelar</button>
+            <button class="btn btn-primary" id="btnSave" onclick="save()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="modal-overlay" id="modalDel">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header">
+            <h3>Confirmar Exclusão</h3>
+            <button class="modal-close" onclick="closeModal('modalDel')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <p>Deseja remover o médico <strong id="delName"></strong>? Esta ação não pode ser desfeita.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalDel')">Cancelar</button>
+            <button class="btn btn-danger" id="btnDel" onclick="confirmDelete()"><i class="fas fa-trash"></i> Remover</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/common.js"></script>
+<script>
+let medicos = [], delId = null, searchTimer;
+
+async function load(search = '') {
+    const url = search ? `/api/medicos?search=${encodeURIComponent(search)}` : '/api/medicos';
+    medicos = await apiFetch(url);
+    render();
+}
+
+function render() {
+    document.getElementById('countBadge').textContent = medicos.length;
+    const tbody = document.getElementById('tableBody');
+    if (medicos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-user-md"></i><p>Nenhum médico encontrado.</p></div></td></tr>';
+        return;
+    }
+    tbody.innerHTML = medicos.map(m => `
+        <tr>
+            <td><strong>${m.nome}</strong></td>
+            <td><code style="font-size:.8rem;">${m.crm}</code></td>
+            <td><span class="badge badge-info">${m.especialidade}</span></td>
+            <td>${m.telefone || '<span class="text-muted">-</span>'}</td>
+            <td>${m.email || '<span class="text-muted">-</span>'}</td>
+            <td>
+                <button class="btn btn-edit btn-sm" onclick="edit(${m.id_medico})"><i class="fas fa-edit"></i> Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="del(${m.id_medico}, '${m.nome.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function openNew() {
+    document.getElementById('form').reset();
+    document.getElementById('medicoId').value = '';
+    document.getElementById('modalTitle').textContent = 'Novo Médico';
+    clearAlert('alertModal');
+    openModal('modal');
+}
+
+async function edit(id) {
+    const m = await apiFetch(`/api/medicos/${id}`);
+    document.getElementById('medicoId').value = m.id_medico;
+    document.getElementById('nome').value = m.nome;
+    document.getElementById('crm').value = m.crm;
+    document.getElementById('especialidade').value = m.especialidade;
+    document.getElementById('telefone').value = m.telefone || '';
+    document.getElementById('email').value = m.email || '';
+    document.getElementById('modalTitle').textContent = 'Editar Médico';
+    clearAlert('alertModal');
+    openModal('modal');
+}
+
+async function save() {
+    const id = document.getElementById('medicoId').value;
+    const body = {
+        nome: document.getElementById('nome').value,
+        crm: document.getElementById('crm').value,
+        especialidade: document.getElementById('especialidade').value,
+        telefone: document.getElementById('telefone').value,
+        email: document.getElementById('email').value
+    };
+    const btn = document.getElementById('btnSave');
+    btn.disabled = true;
+    try {
+        if (id) await apiFetch(`/api/medicos/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+        else     await apiFetch('/api/medicos', { method: 'POST', body: JSON.stringify(body) });
+        closeModal('modal');
+        showAlert('alertMain', id ? 'Médico atualizado com sucesso!' : 'Médico cadastrado com sucesso!', 'success');
+        load();
+    } catch(e) {
+        showAlert('alertModal', e.message, 'error');
+    }
+    btn.disabled = false;
+}
+
+function del(id, name) { delId = id; document.getElementById('delName').textContent = name; openModal('modalDel'); }
+
+async function confirmDelete() {
+    const btn = document.getElementById('btnDel'); btn.disabled = true;
+    try {
+        await apiFetch(`/api/medicos/${delId}`, { method: 'DELETE' });
+        closeModal('modalDel');
+        showAlert('alertMain', 'Médico removido com sucesso!', 'success');
+        load();
+    } catch(e) { closeModal('modalDel'); showAlert('alertMain', e.message, 'error'); }
+    btn.disabled = false;
+}
+
+function debounceSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => load(document.getElementById('searchInput').value), 350);
+}
+
+initPage('medicos').then(() => load());
+</script>
+</body>
+</html>

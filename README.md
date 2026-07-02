@@ -1,16 +1,146 @@
+# ClinicaMS — Sistema de Agendamento de Consultas Clínicas
 
-Práticas Extensionistas III - Entrega 1
+**Práticas Extensionistas III — Entrega 2**
+**Autor:** Gustavo Alan Barp
 
-Autor: Gustavo Alan Barp
+---
 
-Introdução: O presente projeto propõe o desenvolvimento da modelagem de um sistema de gerenciamento e agendamento de consultas voltado para clínicas médicas. Com a crescente digitalização dos serviços de saúde, torna-se essencial a implementação de ferramentas tecnológicas que otimizem o tempo de médicos e pacientes, reduzindo falhas de comunicação, conflitos de horários e a dependência de processos manuais. Este projeto foca na etapa primordial da engenharia de software: o planejamento e a modelagem estrutural antes da codificação.
+## Sobre o Projeto
 
-Objetivo: O estudo tem por objetivo modelar a estrutura de banco de dados e as interações sistêmicas de uma aplicação que permita a marcação autônoma de consultas por pacientes e o gerenciamento eficiente de agendas por parte dos profissionais de saúde. Busca-se garantir a integridade dos dados e uma lógica de negócios fluida.
+Sistema web completo para gerenciamento e agendamento de consultas em clínicas médicas. Desenvolvido com Node.js, Express e SQLite como MVP funcional.
 
-Metodologia: Trata-se de uma pesquisa aplicada focada em engenharia de software e análise de sistemas. Utilizou-se a linguagem padrão da indústria, a UML (Unified Modeling Language), para o mapeamento visual do sistema através de quatro perspectivas: Diagrama de Casos de Uso (mapeamento de atores e ações), Diagrama de Classes (arquitetura orientada a objetos), Diagrama de Atividades (fluxos de decisão) e Diagrama de Sequência (linha do tempo das mensagens entre interface e banco de dados). Adicionalmente, empregou-se a ferramenta brModelo para a criação rigorosa dos modelos Conceitual e Lógico de banco de dados relacional.
+## Tecnologias
 
-Resultados: Identifica-se a modelagem completa e consistente dos requisitos do sistema. As entidades principais — Paciente, Médico e Consulta — foram detalhadas com seus respectivos atributos, métodos e chaves de relacionamento (PK/FK). O fluxo de decisão para agendamentos foi estruturado logicamente, prevendo e garantindo o tratamento de exceções, como a indisponibilidade de horários. Todo o escopo técnico necessário para iniciar a futura fase de desenvolvimento (codificação na pasta app) encontra-se documentado na pasta doc deste repositório.
+| Camada     | Tecnologia |
+|------------|------------|
+| Backend    | Node.js + Express |
+| Banco      | SQLite (better-sqlite3) |
+| Frontend   | HTML5 + CSS3 + JavaScript (Vanilla) |
+| Ícones     | Font Awesome 6 |
+| Autenticação | express-session + bcryptjs |
 
-Conclusão: O desenvolvimento da modelagem deste Sistema de Agendamento Clínico evidenciou a importância fundamental do planejamento estruturado na construção de softwares. Conclui-se que a elaboração de diagramas UML e de banco de dados resulta em uma arquitetura de sistema robusta, reduzindo significativamente a margem de erros, retrabalhos e falhas de lógica para a futura fase de desenvolvimento do código, garantindo uma solução eficiente e uma experiência otimizada para o usuário final.
+## Modelo Relacional (Atualizado — Entrega 2)
 
-Palavras-chave: Agendamento Médico. Modelagem de Dados. Diagramas UML. Engenharia de Software. Sistemas de Informação.
+```
+USUARIO (id_usuario PK, email UNIQUE, senha, tipo, nome)
+
+MEDICO (id_medico PK, nome, crm UNIQUE, especialidade, telefone, email, ativo)
+
+PACIENTE (id_paciente PK, nome, cpf UNIQUE, telefone, email, data_nascimento, ativo)
+
+CONSULTA (id_consulta PK,
+          data, hora, status, motivo, prontuario,
+          id_medico FK → MEDICO,
+          id_paciente FK → PACIENTE)
+
+CONTATO (id_contato PK, nome, email, assunto, mensagem, enviado_em)
+```
+
+> O schema SQL completo está em `app/database/schema.sql`
+
+### Alterações em relação à Entrega 1
+
+- **MEDICO**: adicionados `especialidade`, `telefone`, `email`, `ativo`
+- **PACIENTE**: adicionados `telefone`, `email`, `data_nascimento`, `ativo`
+- **CONSULTA**: `REALIZA` + `AGENDA` consolidadas em uma tabela com FKs diretas; adicionados `status`, `motivo`, `prontuario`
+- **USUARIO** (nova): autenticação com senha criptografada
+- **CONTATO** (nova): armazena mensagens do formulário de contato
+
+## Como Executar
+
+```bash
+cd app
+npm install
+npm start
+```
+
+Acesse: **http://localhost:3000**
+
+**Credenciais padrão:**
+- Email: `admin@clinica.com`
+- Senha: `admin123`
+
+## Interfaces Implementadas
+
+| Interface | Rota | Descrição |
+|-----------|------|-----------|
+| Landing Page | `/` | Página principal pública com apresentação do sistema |
+| Login | `/login.html` | Autenticação com e-mail e senha |
+| Dashboard | `/dashboard.html` | Visão geral com estatísticas e próximas consultas |
+| Pacientes | `/pacientes.html` | CRUD completo de pacientes |
+| Médicos | `/medicos.html` | CRUD completo de médicos |
+| Consultas | `/consultas.html` | CRUD de consultas com detecção de conflito de horário |
+| Relatório | `/relatorio.html` | Pesquisa e relatório com filtros avançados e impressão |
+| Contato | `/contato.html` | Formulário de contato com os desenvolvedores |
+
+## API REST
+
+```
+POST   /api/auth/login
+POST   /api/auth/logout
+GET    /api/auth/me
+
+GET    /api/pacientes          (+ ?search=)
+POST   /api/pacientes
+PUT    /api/pacientes/:id
+DELETE /api/pacientes/:id
+
+GET    /api/medicos            (+ ?search=)
+POST   /api/medicos
+PUT    /api/medicos/:id
+DELETE /api/medicos/:id
+
+GET    /api/consultas          (+ ?data_inicio, data_fim, id_medico, id_paciente, status, search)
+GET    /api/consultas/stats
+POST   /api/consultas
+PUT    /api/consultas/:id
+DELETE /api/consultas/:id      (cancela)
+
+POST   /api/contato
+```
+
+## Estrutura de Pastas
+
+```
+Praticas-Extensionistas-III/
+├── app/
+│   ├── server.js
+│   ├── package.json
+│   ├── database/
+│   │   ├── db.js          (inicialização + seed)
+│   │   └── schema.sql     (modelo relacional documentado)
+│   ├── middleware/
+│   │   └── auth.js
+│   ├── routes/
+│   │   ├── auth.js
+│   │   ├── pacientes.js
+│   │   ├── medicos.js
+│   │   ├── consultas.js
+│   │   └── contato.js
+│   └── public/
+│       ├── index.html      (landing page)
+│       ├── login.html
+│       ├── dashboard.html
+│       ├── pacientes.html
+│       ├── medicos.html
+│       ├── consultas.html
+│       ├── relatorio.html
+│       ├── contato.html
+│       ├── css/style.css
+│       └── js/common.js
+└── doc/
+    ├── Modelo_Conceitual.png
+    ├── Modelo_Logico.png
+    ├── Diagrama de Casos de Uso.png
+    ├── Diagrama de Classes.png
+    ├── Diagrama de Atividades.png
+    └── Diagrama_Sequencia.png
+```
+
+## Funcionalidades de Destaque
+
+- **Conflito de horário**: ao agendar, verifica automaticamente se o médico já tem consulta naquele horário
+- **Soft delete**: pacientes e médicos são desativados (não excluídos) para manter integridade referencial
+- **Sessão segura**: senha armazenada com bcrypt, sessão expira em 8h
+- **Relatório imprimível**: página de relatório tem suporte a impressão (CSS @media print)
+- **Dados de exemplo**: banco é semeado automaticamente com 4 médicos, 4 pacientes e 6 consultas

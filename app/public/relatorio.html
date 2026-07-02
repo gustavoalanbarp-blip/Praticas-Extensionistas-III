@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios — ClinicaMS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .filter-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem; box-shadow:var(--shadow); }
+        .filter-card h3 { font-size:.9rem; font-weight:700; margin-bottom:1rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; font-size:.75rem; }
+        .summary-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.5rem; }
+        @media(max-width:900px){ .summary-grid{grid-template-columns:repeat(2,1fr);} }
+        @media(max-width:500px){ .summary-grid{grid-template-columns:1fr;} }
+        .summary-card { padding:1rem 1.25rem; border-radius:var(--radius); border:1px solid var(--border); background:#fff; text-align:center; }
+        .summary-val { font-size:2rem; font-weight:800; }
+        .summary-lbl { font-size:.75rem; color:var(--text-muted); font-weight:600; margin-top:.2rem; }
+        @media print {
+            .sidebar, .topbar, .filter-card, .print-hide { display:none!important; }
+            .main-content { margin-left:0!important; }
+            .content-area { padding:.5rem!important; }
+        }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+    <nav class="sidebar">
+        <div class="sidebar-header"><a href="/index.html" class="sidebar-logo"><i class="fas fa-heartbeat"></i> ClinicaMS</a></div>
+        <div class="sidebar-nav">
+            <a href="/dashboard.html" class="nav-link" data-page="dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+            <div class="sidebar-section">Cadastros</div>
+            <a href="/pacientes.html" class="nav-link" data-page="pacientes"><i class="fas fa-user-injured"></i> Pacientes</a>
+            <a href="/medicos.html" class="nav-link" data-page="medicos"><i class="fas fa-user-md"></i> Médicos</a>
+            <div class="sidebar-section">Agenda</div>
+            <a href="/consultas.html" class="nav-link" data-page="consultas"><i class="fas fa-calendar-alt"></i> Consultas</a>
+            <a href="/relatorio.html" class="nav-link" data-page="relatorio"><i class="fas fa-chart-bar"></i> Relatórios</a>
+            <div class="sidebar-section">Outros</div>
+            <a href="/contato.html" class="nav-link" data-page="contato"><i class="fas fa-envelope"></i> Contato</a>
+        </div>
+        <div class="sidebar-footer"><button class="btn-logout" id="btnLogout"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
+    </nav>
+
+    <main class="main-content">
+        <header class="topbar">
+            <span class="topbar-title"><i class="fas fa-chart-bar" style="color:#7C3AED;"></i> Relatório de Consultas</span>
+            <div class="topbar-user"><div class="avatar" id="userAvatar">A</div><span id="userName"></span></div>
+        </header>
+        <div class="content-area">
+            <div class="page-header print-hide">
+                <h1>Relatório de Consultas</h1>
+                <div class="d-flex gap-1">
+                    <button class="btn btn-primary" onclick="search()"><i class="fas fa-search"></i> Buscar</button>
+                    <button class="btn btn-outline" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
+                </div>
+            </div>
+
+            <!-- FILTERS -->
+            <div class="filter-card print-hide">
+                <h3><i class="fas fa-filter"></i> Filtros de Pesquisa</h3>
+                <div class="form-row">
+                    <div class="form-group" style="margin:0;">
+                        <label>Data Início</label>
+                        <input type="date" class="form-control" id="dtIni">
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Data Fim</label>
+                        <input type="date" class="form-control" id="dtFim">
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Médico</label>
+                        <select class="form-control" id="medicoFiltro">
+                            <option value="">Todos os médicos</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Status</label>
+                        <select class="form-control" id="statusFiltro">
+                            <option value="">Todos os status</option>
+                            <option value="agendada">Agendada</option>
+                            <option value="realizada">Realizada</option>
+                            <option value="cancelada">Cancelada</option>
+                        </select>
+                    </div>
+                    <div class="search-box form-group" style="margin:0;">
+                        <label>Busca livre</label>
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" id="busca" placeholder="Nome do paciente ou médico...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUMMARY -->
+            <div class="summary-grid" id="summaryArea" style="display:none;">
+                <div class="summary-card">
+                    <div class="summary-val" id="sumTotal" style="color:var(--text);">0</div>
+                    <div class="summary-lbl">Total de Consultas</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-val" id="sumAgendada" style="color:#1D4ED8;">0</div>
+                    <div class="summary-lbl">Agendadas</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-val" id="sumRealizada" style="color:#15803D;">0</div>
+                    <div class="summary-lbl">Realizadas</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-val" id="sumCancelada" style="color:#B91C1C;">0</div>
+                    <div class="summary-lbl">Canceladas</div>
+                </div>
+            </div>
+
+            <!-- RESULT TABLE -->
+            <div class="table-container" id="resultArea" style="display:none;">
+                <div class="table-toolbar">
+                    <h2>Resultados <span class="badge badge-info" id="resultCount">0</span></h2>
+                    <span class="text-muted text-sm" id="resultPeriod"></span>
+                </div>
+                <div class="table-overflow">
+                    <table>
+                        <thead>
+                            <tr><th>#</th><th>Data</th><th>Hora</th><th>Paciente</th><th>CPF</th><th>Médico</th><th>Especialidade</th><th>Motivo</th><th>Status</th></tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- EMPTY (initial state) -->
+            <div id="emptyState" class="card" style="padding:3rem;text-align:center;">
+                <i class="fas fa-chart-bar" style="font-size:3rem;color:#CBD5E1;margin-bottom:1rem;display:block;"></i>
+                <h3 style="color:var(--text-muted);font-size:1rem;">Defina os filtros e clique em <strong>Buscar</strong> para gerar o relatório.</h3>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="/js/common.js"></script>
+<script>
+async function loadMedicos() {
+    const medicos = await apiFetch('/api/medicos');
+    const sel = document.getElementById('medicoFiltro');
+    medicos.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id_medico; opt.textContent = m.nome;
+        sel.appendChild(opt);
+    });
+}
+
+async function search() {
+    const params = new URLSearchParams();
+    const dtIni = document.getElementById('dtIni').value;
+    const dtFim = document.getElementById('dtFim').value;
+    const medico = document.getElementById('medicoFiltro').value;
+    const status = document.getElementById('statusFiltro').value;
+    const busca = document.getElementById('busca').value;
+    if (dtIni) params.set('data_inicio', dtIni);
+    if (dtFim) params.set('data_fim', dtFim);
+    if (medico) params.set('id_medico', medico);
+    if (status) params.set('status', status);
+    if (busca) params.set('search', busca);
+
+    const consultas = await apiFetch('/api/consultas?' + params.toString());
+    renderResults(consultas, dtIni, dtFim);
+}
+
+function renderResults(consultas, dtIni, dtFim) {
+    document.getElementById('emptyState').style.display = 'none';
+    document.getElementById('summaryArea').style.display = 'grid';
+    document.getElementById('resultArea').style.display = 'block';
+
+    // Summary
+    const total = consultas.length;
+    const ag = consultas.filter(c => c.status === 'agendada').length;
+    const re = consultas.filter(c => c.status === 'realizada').length;
+    const ca = consultas.filter(c => c.status === 'cancelada').length;
+    document.getElementById('sumTotal').textContent = total;
+    document.getElementById('sumAgendada').textContent = ag;
+    document.getElementById('sumRealizada').textContent = re;
+    document.getElementById('sumCancelada').textContent = ca;
+    document.getElementById('resultCount').textContent = total;
+
+    // Period label
+    let period = '';
+    if (dtIni && dtFim) period = `Período: ${formatDate(dtIni)} a ${formatDate(dtFim)}`;
+    else if (dtIni) period = `A partir de: ${formatDate(dtIni)}`;
+    else if (dtFim) period = `Até: ${formatDate(dtFim)}`;
+    document.getElementById('resultPeriod').textContent = period;
+
+    const tbody = document.getElementById('tableBody');
+    if (total === 0) {
+        tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><i class="fas fa-search"></i><p>Nenhum resultado para os filtros selecionados.</p></div></td></tr>';
+        return;
+    }
+    tbody.innerHTML = consultas.map((c, i) => `
+        <tr>
+            <td class="text-muted text-sm">${i + 1}</td>
+            <td>${formatDate(c.data)}</td>
+            <td>${c.hora}</td>
+            <td><strong>${c.paciente_nome}</strong></td>
+            <td><code style="font-size:.75rem;">${c.cpf || ''}</code></td>
+            <td>${c.medico_nome}</td>
+            <td>${c.especialidade}</td>
+            <td><span class="text-muted text-sm">${c.motivo || '-'}</span></td>
+            <td>${statusBadge(c.status)}</td>
+        </tr>
+    `).join('');
+}
+
+initPage('relatorio').then(() => loadMedicos());
+</script>
+</body>
+</html>

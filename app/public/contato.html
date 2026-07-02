@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contato — ClinicaMS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .contact-grid { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; }
+        @media (max-width: 900px) { .contact-grid { grid-template-columns: 1fr; } }
+        .info-card { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1.75rem; box-shadow:var(--shadow); }
+        .info-item { display:flex; align-items:flex-start; gap:1rem; padding:.9rem 0; border-bottom:1px solid var(--border); }
+        .info-item:last-child { border-bottom:none; }
+        .info-icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+        .info-item h4 { font-size:.875rem; font-weight:700; margin-bottom:.2rem; }
+        .info-item p { font-size:.8rem; color:var(--text-muted); }
+        .dev-card { background: linear-gradient(135deg, #0F172A, #0C4A6E); border-radius:var(--radius); padding:1.5rem; color:#fff; margin-top:1.5rem; }
+        .dev-card h3 { font-size:.9rem; color:#94A3B8; margin-bottom:.75rem; }
+        .dev-item { display:flex; align-items:center; gap:.75rem; padding:.6rem 0; border-bottom:1px solid rgba(255,255,255,.08); }
+        .dev-item:last-child { border-bottom:none; }
+        .dev-avatar { width:36px; height:36px; border-radius:50%; background:rgba(14,165,233,.25); color:#38BDF8; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.9rem; }
+        .dev-item h4 { font-size:.875rem; font-weight:600; }
+        .dev-item p { font-size:.75rem; color:#94A3B8; }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+    <nav class="sidebar">
+        <div class="sidebar-header"><a href="/index.html" class="sidebar-logo"><i class="fas fa-heartbeat"></i> ClinicaMS</a></div>
+        <div class="sidebar-nav">
+            <a href="/dashboard.html" class="nav-link" data-page="dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+            <div class="sidebar-section">Cadastros</div>
+            <a href="/pacientes.html" class="nav-link" data-page="pacientes"><i class="fas fa-user-injured"></i> Pacientes</a>
+            <a href="/medicos.html" class="nav-link" data-page="medicos"><i class="fas fa-user-md"></i> Médicos</a>
+            <div class="sidebar-section">Agenda</div>
+            <a href="/consultas.html" class="nav-link" data-page="consultas"><i class="fas fa-calendar-alt"></i> Consultas</a>
+            <a href="/relatorio.html" class="nav-link" data-page="relatorio"><i class="fas fa-chart-bar"></i> Relatórios</a>
+            <div class="sidebar-section">Outros</div>
+            <a href="/contato.html" class="nav-link" data-page="contato"><i class="fas fa-envelope"></i> Contato</a>
+        </div>
+        <div class="sidebar-footer"><button class="btn-logout" id="btnLogout"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
+    </nav>
+
+    <main class="main-content">
+        <header class="topbar">
+            <span class="topbar-title"><i class="fas fa-envelope" style="color:#0EA5E9;"></i> Contato</span>
+            <div class="topbar-user"><div class="avatar" id="userAvatar">A</div><span id="userName"></span></div>
+        </header>
+        <div class="content-area">
+            <div class="page-header">
+                <h1>Entre em Contato</h1>
+            </div>
+
+            <div class="contact-grid">
+                <!-- FORM -->
+                <div class="card" style="padding:2rem;">
+                    <h2 style="font-size:1rem;font-weight:700;margin-bottom:.35rem;">Enviar Mensagem</h2>
+                    <p class="text-muted text-sm" style="margin-bottom:1.5rem;">Preencha o formulário abaixo e nossa equipe responderá em breve.</p>
+
+                    <div id="alertForm"></div>
+
+                    <form id="contactForm">
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Nome Completo *</label>
+                                <input type="text" class="form-control" id="nome" placeholder="Seu nome" required>
+                            </div>
+                            <div class="form-group">
+                                <label>E-mail *</label>
+                                <input type="email" class="form-control" id="email" placeholder="seu@email.com" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Assunto *</label>
+                            <select class="form-control" id="assunto" required>
+                                <option value="">Selecione o assunto...</option>
+                                <option>Sugestão de melhoria</option>
+                                <option>Reporte de problema/bug</option>
+                                <option>Dúvida sobre o sistema</option>
+                                <option>Solicitação de nova funcionalidade</option>
+                                <option>Elogio</option>
+                                <option>Outro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Mensagem *</label>
+                            <textarea class="form-control" id="mensagem" rows="5" placeholder="Descreva sua mensagem em detalhes..." required style="resize:vertical;"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="btnSubmit" style="width:100%;justify-content:center;">
+                            <i class="fas fa-paper-plane"></i> Enviar Mensagem
+                        </button>
+                    </form>
+                </div>
+
+                <!-- INFO -->
+                <div>
+                    <div class="info-card">
+                        <h3 style="font-size:.875rem;font-weight:700;margin-bottom:1rem;">Informações de Contato</h3>
+                        <div class="info-item">
+                            <div class="info-icon" style="background:#DBEAFE;color:#1D4ED8;"><i class="fas fa-map-marker-alt"></i></div>
+                            <div>
+                                <h4>Localização</h4>
+                                <p>Brasil — Projeto Acadêmico<br>Práticas Extensionistas III</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon" style="background:#DCFCE7;color:#15803D;"><i class="fab fa-github"></i></div>
+                            <div>
+                                <h4>GitHub do Projeto</h4>
+                                <p>Código disponível no repositório<br>Praticas-Extensionistas-III</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon" style="background:#FEF3C7;color:#D97706;"><i class="fas fa-clock"></i></div>
+                            <div>
+                                <h4>Tempo de Resposta</h4>
+                                <p>Respostas em até 48 horas<br>durante dias úteis</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dev-card">
+                        <h3><i class="fas fa-code"></i> Desenvolvedor</h3>
+                        <div class="dev-item">
+                            <div class="dev-avatar">G</div>
+                            <div>
+                                <h4>Gustavo Alan Barp</h4>
+                                <p>Desenvolvedor — Práticas Extensionistas III</p>
+                            </div>
+                        </div>
+                        <div style="margin-top:1rem;padding-top:.75rem;border-top:1px solid rgba(255,255,255,.1);font-size:.75rem;color:#64748B;">
+                            <p>Sistema desenvolvido como projeto acadêmico de Práticas Extensionistas III.</p>
+                            <p style="margin-top:.4rem;">Tecnologias: Node.js · Express · SQLite · HTML/CSS/JS</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="/js/common.js"></script>
+<script>
+document.getElementById('contactForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+    clearAlert('alertForm');
+
+    const body = {
+        nome: document.getElementById('nome').value,
+        email: document.getElementById('email').value,
+        assunto: document.getElementById('assunto').value,
+        mensagem: document.getElementById('mensagem').value
+    };
+
+    try {
+        await apiFetch('/api/contato', { method: 'POST', body: JSON.stringify(body) });
+        showAlert('alertForm', '<strong>Mensagem enviada com sucesso!</strong> Obrigado pelo seu contato. Responderemos em breve.', 'success');
+        this.reset();
+    } catch(e) {
+        showAlert('alertForm', e.message, 'error');
+    }
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Mensagem';
+});
+
+// Page is accessible without auth too (for public access)
+// But if logged in, show user info
+fetch('/api/auth/me').then(r => {
+    if (r.ok) return r.json();
+    return null;
+}).then(user => {
+    if (!user) return;
+    const nameEl = document.getElementById('userName');
+    const avatarEl = document.getElementById('userAvatar');
+    if (nameEl) nameEl.textContent = user.nome;
+    if (avatarEl) avatarEl.textContent = (user.nome || 'A').charAt(0).toUpperCase();
+    document.querySelectorAll('.nav-link').forEach(l => { if (l.dataset.page === 'contato') l.classList.add('active'); });
+    const logoutBtn = document.getElementById('btnLogout');
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
+});
+</script>
+</body>
+</html>

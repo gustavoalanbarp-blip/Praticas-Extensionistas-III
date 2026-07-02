@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultas — ClinicaMS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="d-flex">
+    <nav class="sidebar">
+        <div class="sidebar-header"><a href="/index.html" class="sidebar-logo"><i class="fas fa-heartbeat"></i> ClinicaMS</a></div>
+        <div class="sidebar-nav">
+            <a href="/dashboard.html" class="nav-link" data-page="dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+            <div class="sidebar-section">Cadastros</div>
+            <a href="/pacientes.html" class="nav-link" data-page="pacientes"><i class="fas fa-user-injured"></i> Pacientes</a>
+            <a href="/medicos.html" class="nav-link" data-page="medicos"><i class="fas fa-user-md"></i> Médicos</a>
+            <div class="sidebar-section">Agenda</div>
+            <a href="/consultas.html" class="nav-link" data-page="consultas"><i class="fas fa-calendar-alt"></i> Consultas</a>
+            <a href="/relatorio.html" class="nav-link" data-page="relatorio"><i class="fas fa-chart-bar"></i> Relatórios</a>
+            <div class="sidebar-section">Outros</div>
+            <a href="/contato.html" class="nav-link" data-page="contato"><i class="fas fa-envelope"></i> Contato</a>
+        </div>
+        <div class="sidebar-footer"><button class="btn-logout" id="btnLogout"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
+    </nav>
+
+    <main class="main-content">
+        <header class="topbar">
+            <span class="topbar-title"><i class="fas fa-calendar-alt" style="color:#D97706;"></i> Consultas</span>
+            <div class="topbar-user"><div class="avatar" id="userAvatar">A</div><span id="userName"></span></div>
+        </header>
+        <div class="content-area">
+            <div class="page-header">
+                <h1>Gerenciar Consultas</h1>
+                <button class="btn btn-primary" onclick="openNew()"><i class="fas fa-plus"></i> Nova Consulta</button>
+            </div>
+            <div id="alertMain"></div>
+
+            <!-- Filter bar -->
+            <div class="card" style="padding:1rem 1.25rem;margin-bottom:1.25rem;">
+                <div class="form-row" style="align-items:flex-end;gap:.75rem;">
+                    <div class="form-group" style="margin:0;">
+                        <label>Status</label>
+                        <select class="form-control" id="filterStatus" onchange="load()">
+                            <option value="">Todos</option>
+                            <option value="agendada">Agendadas</option>
+                            <option value="realizada">Realizadas</option>
+                            <option value="cancelada">Canceladas</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Data Início</label>
+                        <input type="date" class="form-control" id="filterDtIni" onchange="load()">
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Data Fim</label>
+                        <input type="date" class="form-control" id="filterDtFim" onchange="load()">
+                    </div>
+                    <div class="search-box form-group" style="margin:0;flex:1;">
+                        <label>Busca</label>
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Paciente, médico ou motivo..." oninput="debounceSearch()">
+                    </div>
+                    <button class="btn btn-outline" onclick="clearFilters()" style="margin-bottom:0;flex-shrink:0;"><i class="fas fa-times"></i> Limpar</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-toolbar">
+                    <h2>Lista de Consultas <span class="badge badge-info" id="countBadge">0</span></h2>
+                </div>
+                <div class="table-overflow">
+                    <table>
+                        <thead>
+                            <tr><th>Paciente</th><th>Médico</th><th>Especialidade</th><th>Data</th><th>Hora</th><th>Motivo</th><th>Status</th><th>Ações</th></tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- MODAL FORM -->
+<div class="modal-overlay" id="modal">
+    <div class="modal-box" style="max-width:620px;">
+        <div class="modal-header">
+            <h3 id="modalTitle">Nova Consulta</h3>
+            <button class="modal-close" onclick="closeModal('modal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div id="alertModal"></div>
+            <form id="form">
+                <input type="hidden" id="consultaId">
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Paciente *</label>
+                        <select class="form-control" id="pacienteId" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Médico *</label>
+                        <select class="form-control" id="medicoId" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Data *</label>
+                        <input type="date" class="form-control" id="data" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hora *</label>
+                        <input type="time" class="form-control" id="hora" required>
+                    </div>
+                    <div class="form-group" style="grid-column:1/-1;">
+                        <label>Motivo da Consulta</label>
+                        <input type="text" class="form-control" id="motivo" placeholder="Descreva brevemente o motivo...">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select class="form-control" id="status">
+                            <option value="agendada">Agendada</option>
+                            <option value="realizada">Realizada</option>
+                            <option value="cancelada">Cancelada</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" id="prontuarioGroup" style="display:none;">
+                    <label>Prontuário / Observações</label>
+                    <textarea class="form-control" id="prontuario" rows="3" placeholder="Registre as anotações médicas..."></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modal')">Cancelar</button>
+            <button class="btn btn-primary" id="btnSave" onclick="save()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/common.js"></script>
+<script>
+let consultas = [], searchTimer;
+
+// Show prontuario field when status = realizada
+document.getElementById('status').addEventListener('change', function() {
+    document.getElementById('prontuarioGroup').style.display = this.value === 'realizada' ? 'block' : 'none';
+});
+
+async function loadSelects() {
+    const [medicos, pacientes] = await Promise.all([apiFetch('/api/medicos'), apiFetch('/api/pacientes')]);
+    const selM = document.getElementById('medicoId');
+    const selP = document.getElementById('pacienteId');
+    selM.innerHTML = '<option value="">Selecione o médico...</option>' + medicos.map(m => `<option value="${m.id_medico}">${m.nome} — ${m.especialidade}</option>`).join('');
+    selP.innerHTML = '<option value="">Selecione o paciente...</option>' + pacientes.map(p => `<option value="${p.id_paciente}">${p.nome} (CPF: ${p.cpf})</option>`).join('');
+}
+
+async function load() {
+    const params = new URLSearchParams();
+    const status = document.getElementById('filterStatus').value;
+    const dtIni = document.getElementById('filterDtIni').value;
+    const dtFim = document.getElementById('filterDtFim').value;
+    const search = document.getElementById('searchInput').value;
+    if (status) params.set('status', status);
+    if (dtIni) params.set('data_inicio', dtIni);
+    if (dtFim) params.set('data_fim', dtFim);
+    if (search) params.set('search', search);
+    consultas = await apiFetch('/api/consultas?' + params.toString());
+    render();
+}
+
+function render() {
+    document.getElementById('countBadge').textContent = consultas.length;
+    const tbody = document.getElementById('tableBody');
+    if (consultas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="fas fa-calendar-times"></i><p>Nenhuma consulta encontrada.</p></div></td></tr>';
+        return;
+    }
+    tbody.innerHTML = consultas.map(c => `
+        <tr>
+            <td><strong>${c.paciente_nome}</strong></td>
+            <td>${c.medico_nome}</td>
+            <td><span class="text-muted text-sm">${c.especialidade}</span></td>
+            <td>${formatDate(c.data)}</td>
+            <td><strong>${c.hora}</strong></td>
+            <td><span class="text-muted text-sm">${c.motivo || '-'}</span></td>
+            <td>${statusBadge(c.status)}</td>
+            <td style="white-space:nowrap;">
+                <button class="btn btn-edit btn-sm" onclick="edit(${c.id_consulta})"><i class="fas fa-edit"></i></button>
+                ${c.status === 'agendada' ? `<button class="btn btn-danger btn-sm" onclick="cancel(${c.id_consulta})" title="Cancelar"><i class="fas fa-ban"></i></button>` : ''}
+            </td>
+        </tr>
+    `).join('');
+}
+
+function openNew() {
+    document.getElementById('form').reset();
+    document.getElementById('consultaId').value = '';
+    document.getElementById('modalTitle').textContent = 'Nova Consulta';
+    document.getElementById('data').value = new Date().toISOString().split('T')[0];
+    document.getElementById('prontuarioGroup').style.display = 'none';
+    clearAlert('alertModal');
+    openModal('modal');
+}
+
+async function edit(id) {
+    const c = await apiFetch(`/api/consultas/${id}`);
+    document.getElementById('consultaId').value = c.id_consulta;
+    document.getElementById('pacienteId').value = c.id_paciente;
+    document.getElementById('medicoId').value = c.id_medico;
+    document.getElementById('data').value = c.data;
+    document.getElementById('hora').value = c.hora;
+    document.getElementById('motivo').value = c.motivo || '';
+    document.getElementById('status').value = c.status;
+    document.getElementById('prontuario').value = c.prontuario || '';
+    document.getElementById('prontuarioGroup').style.display = c.status === 'realizada' ? 'block' : 'none';
+    document.getElementById('modalTitle').textContent = 'Editar Consulta';
+    clearAlert('alertModal');
+    openModal('modal');
+}
+
+async function save() {
+    const id = document.getElementById('consultaId').value;
+    const body = {
+        id_paciente: document.getElementById('pacienteId').value,
+        id_medico: document.getElementById('medicoId').value,
+        data: document.getElementById('data').value,
+        hora: document.getElementById('hora').value,
+        motivo: document.getElementById('motivo').value,
+        status: document.getElementById('status').value,
+        prontuario: document.getElementById('prontuario').value
+    };
+    const btn = document.getElementById('btnSave'); btn.disabled = true;
+    try {
+        if (id) await apiFetch(`/api/consultas/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+        else     await apiFetch('/api/consultas', { method: 'POST', body: JSON.stringify(body) });
+        closeModal('modal');
+        showAlert('alertMain', id ? 'Consulta atualizada!' : 'Consulta agendada com sucesso!', 'success');
+        load();
+    } catch(e) { showAlert('alertModal', e.message, 'error'); }
+    btn.disabled = false;
+}
+
+async function cancel(id) {
+    if (!confirm('Confirmar cancelamento desta consulta?')) return;
+    try {
+        await apiFetch(`/api/consultas/${id}`, { method: 'DELETE' });
+        showAlert('alertMain', 'Consulta cancelada.', 'success');
+        load();
+    } catch(e) { showAlert('alertMain', e.message, 'error'); }
+}
+
+function clearFilters() {
+    document.getElementById('filterStatus').value = '';
+    document.getElementById('filterDtIni').value = '';
+    document.getElementById('filterDtFim').value = '';
+    document.getElementById('searchInput').value = '';
+    load();
+}
+
+function debounceSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(load, 350);
+}
+
+initPage('consultas').then(async () => { await loadSelects(); load(); });
+</script>
+</body>
+</html>

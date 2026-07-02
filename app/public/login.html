@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — ClinicaMS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh; display: flex; align-items: stretch;
+            background: #F1F5F9;
+        }
+        /* Left panel */
+        .left-panel {
+            flex: 1; background: linear-gradient(160deg, #0F172A 0%, #0C4A6E 60%, #0369A1 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 3rem; color: #fff; min-height: 100vh;
+        }
+        @media (max-width: 768px) { .left-panel { display: none; } }
+        .left-logo { display: flex; align-items: center; gap: .75rem; font-size: 1.5rem; font-weight: 800; margin-bottom: 2.5rem; }
+        .left-logo i { color: #38BDF8; font-size: 2rem; }
+        .left-panel h2 { font-size: 1.875rem; font-weight: 800; line-height: 1.25; max-width: 340px; margin-bottom: 1rem; }
+        .left-panel h2 span { color: #38BDF8; }
+        .left-panel p { color: #94A3B8; line-height: 1.65; max-width: 340px; margin-bottom: 2rem; font-size: .95rem; }
+        .feature-list { list-style: none; display: flex; flex-direction: column; gap: .85rem; max-width: 340px; }
+        .feature-list li { display: flex; align-items: center; gap: .75rem; font-size: .875rem; color: #CBD5E1; }
+        .feature-list li i { color: #34D399; background: rgba(52,211,153,.15); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .8rem; flex-shrink: 0; }
+
+        /* Right panel */
+        .right-panel {
+            width: 480px; flex-shrink: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 2.5rem;
+            background: #fff;
+        }
+        @media (max-width: 768px) { .right-panel { width: 100%; } }
+        .login-card { width: 100%; max-width: 380px; }
+        .mobile-logo { display: none; align-items: center; gap: .5rem; font-size: 1.2rem; font-weight: 800; color: #0F172A; margin-bottom: 2rem; }
+        .mobile-logo i { color: #0EA5E9; font-size: 1.4rem; }
+        @media (max-width: 768px) { .mobile-logo { display: flex; } }
+        .login-card h1 { font-size: 1.5rem; font-weight: 800; color: #0F172A; margin-bottom: .4rem; }
+        .login-card .subtitle { color: #64748B; font-size: .9rem; margin-bottom: 2rem; }
+
+        label { display: block; font-size: .8rem; font-weight: 600; color: #1E293B; margin-bottom: .35rem; }
+        .input-wrap { position: relative; margin-bottom: 1.1rem; }
+        .input-wrap i { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: #94A3B8; font-size: .875rem; pointer-events: none; }
+        input {
+            width: 100%; padding: .65rem .85rem .65rem 2.4rem;
+            border: 1.5px solid #E2E8F0; border-radius: 9px;
+            font-size: .9rem; color: #1E293B; background: #FAFAFA;
+            transition: border-color .15s, box-shadow .15s; outline: none;
+        }
+        input:focus { border-color: #0EA5E9; box-shadow: 0 0 0 3px rgba(14,165,233,.12); background: #fff; }
+        .input-wrap .toggle-pw { position: absolute; right: .75rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94A3B8; background: none; border: none; font-size: .875rem; padding: .2rem; }
+        .input-wrap .toggle-pw:hover { color: #1E293B; }
+
+        .btn-submit {
+            width: 100%; background: #0EA5E9; color: #fff;
+            border: none; padding: .75rem; border-radius: 9px;
+            font-size: .95rem; font-weight: 700; cursor: pointer;
+            transition: all .15s; display: flex; align-items: center; justify-content: center; gap: .5rem; margin-top: .25rem;
+        }
+        .btn-submit:hover { background: #0369A1; }
+        .btn-submit:disabled { opacity: .65; cursor: not-allowed; }
+
+        .alert { padding: .75rem 1rem; border-radius: 8px; font-size: .85rem; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+        .alert-error   { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+        .alert-success { background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0; }
+
+        .demo-hint {
+            margin-top: 1.5rem; padding: 1rem; background: #F0F9FF;
+            border: 1px solid #BAE6FD; border-radius: 9px; font-size: .8rem; color: #0369A1;
+        }
+        .demo-hint strong { display: block; margin-bottom: .3rem; color: #0C4A6E; }
+        .demo-hint code { background: rgba(3,105,161,.1); padding: .15rem .35rem; border-radius: 4px; font-size: .8rem; }
+
+        .back-link { display: flex; align-items: center; gap: .4rem; color: #64748B; text-decoration: none; font-size: .85rem; margin-top: 1.5rem; justify-content: center; }
+        .back-link:hover { color: #0EA5E9; }
+    </style>
+</head>
+<body>
+    <!-- Left panel -->
+    <div class="left-panel">
+        <div class="left-logo"><i class="fas fa-heartbeat"></i> ClinicaMS</div>
+        <h2>Bem-vindo ao <span>Sistema de Agendamento</span> Clínico</h2>
+        <p>Gerencie médicos, pacientes e consultas de forma simples, segura e eficiente.</p>
+        <ul class="feature-list">
+            <li><i class="fas fa-check"></i> Agendamento com verificação de conflitos</li>
+            <li><i class="fas fa-check"></i> Cadastro completo de pacientes e médicos</li>
+            <li><i class="fas fa-check"></i> Relatórios e pesquisa avançada</li>
+            <li><i class="fas fa-check"></i> Prontuário digital integrado</li>
+            <li><i class="fas fa-check"></i> Banco de dados SQLite funcional</li>
+        </ul>
+    </div>
+
+    <!-- Right panel -->
+    <div class="right-panel">
+        <div class="login-card">
+            <div class="mobile-logo"><i class="fas fa-heartbeat"></i> ClinicaMS</div>
+            <h1>Entrar no sistema</h1>
+            <p class="subtitle">Informe suas credenciais para acessar.</p>
+
+            <div id="alertBox"></div>
+
+            <form id="loginForm" autocomplete="on">
+                <div>
+                    <label for="email">E-mail</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="seu@email.com" required autocomplete="email">
+                    </div>
+                </div>
+                <div>
+                    <label for="senha">Senha</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="senha" name="senha" placeholder="••••••••" required autocomplete="current-password">
+                        <button type="button" class="toggle-pw" id="togglePw"><i class="fas fa-eye" id="eyeIcon"></i></button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit" id="btnSubmit">
+                    <i class="fas fa-sign-in-alt"></i> Entrar
+                </button>
+            </form>
+
+            <div class="demo-hint">
+                <strong><i class="fas fa-info-circle"></i> Credenciais de demonstração</strong>
+                E-mail: <code>admin@clinica.com</code><br>
+                Senha: <code>admin123</code>
+            </div>
+
+            <a href="/index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar ao início</a>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePw').addEventListener('click', function () {
+            const inp = document.getElementById('senha');
+            const icon = document.getElementById('eyeIcon');
+            if (inp.type === 'password') { inp.type = 'text'; icon.className = 'fas fa-eye-slash'; }
+            else { inp.type = 'password'; icon.className = 'fas fa-eye'; }
+        });
+
+        // Submit form
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerHTML = '';
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: document.getElementById('email').value,
+                        senha: document.getElementById('senha').value
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alertBox.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i>${data.error}</div>`;
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+                    return;
+                }
+                alertBox.innerHTML = `<div class="alert alert-success"><i class="fas fa-check-circle"></i>Login realizado! Redirecionando...</div>`;
+                setTimeout(() => window.location.href = '/dashboard.html', 800);
+            } catch {
+                alertBox.innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i>Erro de conexão. Tente novamente.</div>`;
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+            }
+        });
+
+        // If already logged in, redirect
+        fetch('/api/auth/me').then(r => { if (r.ok) window.location.href = '/dashboard.html'; });
+    </script>
+</body>
+</html>

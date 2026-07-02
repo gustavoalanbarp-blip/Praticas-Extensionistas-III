@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — ClinicaMS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="d-flex">
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <a href="/index.html" class="sidebar-logo"><i class="fas fa-heartbeat"></i> ClinicaMS</a>
+        </div>
+        <div class="sidebar-nav">
+            <a href="/dashboard.html" class="nav-link" data-page="dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+            <div class="sidebar-section">Cadastros</div>
+            <a href="/pacientes.html" class="nav-link" data-page="pacientes"><i class="fas fa-user-injured"></i> Pacientes</a>
+            <a href="/medicos.html" class="nav-link" data-page="medicos"><i class="fas fa-user-md"></i> Médicos</a>
+            <div class="sidebar-section">Agenda</div>
+            <a href="/consultas.html" class="nav-link" data-page="consultas"><i class="fas fa-calendar-alt"></i> Consultas</a>
+            <a href="/relatorio.html" class="nav-link" data-page="relatorio"><i class="fas fa-chart-bar"></i> Relatórios</a>
+            <div class="sidebar-section">Outros</div>
+            <a href="/contato.html" class="nav-link" data-page="contato"><i class="fas fa-envelope"></i> Contato</a>
+        </div>
+        <div class="sidebar-footer">
+            <button class="btn-logout" id="btnLogout"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main-content">
+        <header class="topbar">
+            <span class="topbar-title">Dashboard</span>
+            <div class="topbar-user">
+                <div class="avatar" id="userAvatar">A</div>
+                <span id="userName">Carregando...</span>
+            </div>
+        </header>
+        <div class="content-area">
+
+            <div class="page-header">
+                <div>
+                    <h1>Visão Geral</h1>
+                    <p class="text-muted text-sm" id="currentDate"></p>
+                </div>
+                <a href="/consultas.html" class="btn btn-primary"><i class="fas fa-plus"></i> Nova Consulta</a>
+            </div>
+
+            <!-- STATS -->
+            <div class="grid-4" style="margin-bottom:1.5rem;">
+                <div class="stat-card">
+                    <div class="d-flex align-center gap-2" style="justify-content:space-between;">
+                        <div>
+                            <div class="stat-value" id="statHoje">-</div>
+                            <div class="stat-label">Consultas Hoje</div>
+                        </div>
+                        <div class="stat-icon" style="background:#DBEAFE;color:#1D4ED8;"><i class="fas fa-calendar-day"></i></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="d-flex align-center gap-2" style="justify-content:space-between;">
+                        <div>
+                            <div class="stat-value" id="statAgendadas">-</div>
+                            <div class="stat-label">Consultas Agendadas</div>
+                        </div>
+                        <div class="stat-icon" style="background:#FEF3C7;color:#D97706;"><i class="fas fa-clock"></i></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="d-flex align-center gap-2" style="justify-content:space-between;">
+                        <div>
+                            <div class="stat-value" id="statPacientes">-</div>
+                            <div class="stat-label">Pacientes Cadastrados</div>
+                        </div>
+                        <div class="stat-icon" style="background:#DCFCE7;color:#15803D;"><i class="fas fa-users"></i></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="d-flex align-center gap-2" style="justify-content:space-between;">
+                        <div>
+                            <div class="stat-value" id="statMedicos">-</div>
+                            <div class="stat-label">Médicos Ativos</div>
+                        </div>
+                        <div class="stat-icon" style="background:#F3E8FF;color:#7C3AED;"><i class="fas fa-user-md"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STATUS SUMMARY -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+                <div class="card" style="padding:1.25rem;">
+                    <h3 style="font-size:.9rem;font-weight:700;margin-bottom:1rem;">Status das Consultas</h3>
+                    <div style="display:flex;flex-direction:column;gap:.75rem;">
+                        <div class="d-flex align-center gap-2" style="justify-content:space-between;">
+                            <span class="badge badge-agendada"><i class="fas fa-clock"></i>&nbsp;Agendadas</span>
+                            <span class="fw-600" id="statAgendadasBadge">-</span>
+                        </div>
+                        <div class="d-flex align-center gap-2" style="justify-content:space-between;">
+                            <span class="badge badge-realizada"><i class="fas fa-check"></i>&nbsp;Realizadas</span>
+                            <span class="fw-600" id="statRealizadas">-</span>
+                        </div>
+                        <div class="d-flex align-center gap-2" style="justify-content:space-between;">
+                            <span class="badge badge-cancelada"><i class="fas fa-times"></i>&nbsp;Canceladas</span>
+                            <span class="fw-600" id="statCanceladas">-</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="padding:1.25rem;">
+                    <h3 style="font-size:.9rem;font-weight:700;margin-bottom:1rem;">Atalhos Rápidos</h3>
+                    <div style="display:flex;flex-direction:column;gap:.6rem;">
+                        <a href="/pacientes.html" class="btn btn-outline" style="justify-content:flex-start;"><i class="fas fa-user-plus" style="color:#0EA5E9;"></i> Novo Paciente</a>
+                        <a href="/medicos.html" class="btn btn-outline" style="justify-content:flex-start;"><i class="fas fa-user-md" style="color:#16A34A;"></i> Novo Médico</a>
+                        <a href="/relatorio.html" class="btn btn-outline" style="justify-content:flex-start;"><i class="fas fa-chart-bar" style="color:#7C3AED;"></i> Ver Relatório</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROXIMAS CONSULTAS -->
+            <div class="table-container">
+                <div class="table-toolbar">
+                    <h2><i class="fas fa-calendar-check" style="color:#0EA5E9;"></i> Próximas Consultas</h2>
+                    <a href="/consultas.html" class="btn btn-outline btn-sm">Ver todas</a>
+                </div>
+                <div class="table-overflow">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Paciente</th>
+                                <th>Médico</th>
+                                <th>Especialidade</th>
+                                <th>Data</th>
+                                <th>Hora</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr><td colspan="6" class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Carregando...</p></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script src="/js/common.js"></script>
+<script>
+    // Set current date
+    const now = new Date();
+    document.getElementById('currentDate').textContent = now.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+
+    async function loadDashboard() {
+        const user = await initPage('dashboard');
+        if (!user) return;
+
+        // Load stats
+        const stats = await apiFetch('/api/consultas/stats');
+        document.getElementById('statHoje').textContent = stats.hoje;
+        document.getElementById('statAgendadas').textContent = stats.agendada;
+        document.getElementById('statPacientes').textContent = stats.pacientes;
+        document.getElementById('statMedicos').textContent = stats.medicos;
+        document.getElementById('statAgendadasBadge').textContent = stats.agendada;
+        document.getElementById('statRealizadas').textContent = stats.realizada;
+        document.getElementById('statCanceladas').textContent = stats.cancelada;
+
+        // Load upcoming appointments
+        const today = new Date().toISOString().split('T')[0];
+        const consultas = await apiFetch(`/api/consultas?data_inicio=${today}&status=agendada`);
+        const tbody = document.getElementById('tableBody');
+        if (consultas.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-calendar-times"></i><p>Nenhuma consulta agendada para os próximos dias.</p></div></td></tr>';
+            return;
+        }
+        tbody.innerHTML = consultas.slice(0, 8).map(c => `
+            <tr>
+                <td><strong>${c.paciente_nome}</strong></td>
+                <td>${c.medico_nome}</td>
+                <td><span class="text-muted">${c.especialidade}</span></td>
+                <td>${formatDate(c.data)}</td>
+                <td>${c.hora}</td>
+                <td>${statusBadge(c.status)}</td>
+            </tr>
+        `).join('');
+    }
+    loadDashboard();
+</script>
+</body>
+</html>
